@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Indian Stock Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
+        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        .tab-button { padding: 10px 20px; background: #ddd; cursor: pointer; border-radius: 5px 5px 0 0; }
+        .tab-button.active { background: #fff; }
+        .tab-content { display: none; background: #fff; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
+        .widget-container { height: 500px; margin-bottom: 20px; } /* Adjust height as needed */
+    </style>
+</head>
+<body>
+    <h1>Real-Time Indian Stock Market Dashboard (NSE)</h1>
+    <p>Updates in real-time (<10s latency). Data from TradingView. Market hours: 9:15 AM - 3:30 PM IST.</p>
+
+    <div class="tabs">
+        <div class="tab-button active" onclick="openTab('indices')">Indian Indices</div>
+        <div class="tab-button" onclick="openTab('gainers')">Top Gainers</div>
+        <div class="tab-button" onclick="openTab('losers')">Top Losers</div>
+        <div class="tab-button" onclick="openTab('high')">52 Week High</div>
+        <div class="tab-button" onclick="openTab('low')">52 Week Low</div>
+    </div>
+
+    <div id="indices" class="tab-content active">
+        <h2>Indian Indices</h2>
+        <!-- TradingView Widget: Ticker for Indices (Current Value, Change, High, Low) -->
+        <!-- Replace symbols with NSE ones: NIFTY, SENSEX (BSE:SENSEX), etc. -->
+        <div class="tradingview-widget-container widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+            {
+                "symbols": [
+                    { "proName": "NSE:NIFTY", "title": "NIFTY 50" },
+                    { "proName": "BSE:SENSEX", "title": "SENSEX" },
+                    { "proName": "NSE:BANKNIFTY", "title": "NIFTY BANK" },
+                    { "proName": "NSE:NIFTYNEXT50", "title": "NIFTY NEXT 50" }
+                ],
+                "colorTheme": "light",
+                "isTransparent": false,
+                "showSymbolLogo": true,
+                "locale": "en"
+            }
+            </script>
+        </div>
+    </div>
+
+    <div id="gainers" class="tab-content">
+        <h2>Top Gainers (NSE)</h2>
+        <!-- TradingView Widget: Stock Market Overview for Gainers -->
+        <div class="tradingview-widget-container widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+            {
+                "colorTheme": "light",
+                "dateRange": "1D",
+                "exchange": "NSE",
+                "showChart": true,
+                "locale": "en",
+                "largeChartUrl": "",
+                "isTransparent": false,
+                "showSymbolLogo": false,
+                "showFloatingTooltip": false,
+                "width": "100%",
+                "height": "100%",
+                "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
+                "plotLineColorFalling": "rgba(255, 74, 104, 1)",
+                "gridLineColor": "rgba(240, 243, 250, 1)",
+                "scaleFontColor": "rgba(106, 109, 120, 1)",
+                "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
+                "belowLineFillColorFalling": "rgba(255, 74, 104, 0.12)",
+                "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
+                "belowLineFillColorFallingBottom": "rgba(255, 74, 104, 0)",
+                "symbolActiveColor": "rgba(225, 232, 243, 1)",
+                "tabs": [
+                    { "title": "Gainers", "symbols": [], "originalTitle": "Gainers" }  // Auto-pulls top gainers
+                ]
+            }
+            </script>
+        </div>
+    </div>
+
+    <div id="losers" class="tab-content">
+        <h2>Top Losers (NSE)</h2>
+        <!-- Similar to Gainers, but for Losers -->
+        <div class="tradingview-widget-container widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+            {
+                "colorTheme": "light",
+                "dateRange": "1D",
+                "exchange": "NSE",
+                "showChart": true,
+                "locale": "en",
+                "largeChartUrl": "",
+                "isTransparent": false,
+                "showSymbolLogo": false,
+                "showFloatingTooltip": false,
+                "width": "100%",
+                "height": "100%",
+                "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
+                "plotLineColorFalling": "rgba(255, 74, 104, 1)",
+                "gridLineColor": "rgba(240, 243, 250, 1)",
+                "scaleFontColor": "rgba(106, 109, 120, 1)",
+                "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
+                "belowLineFillColorFalling": "rgba(255, 74, 104, 0.12)",
+                "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
+                "belowLineFillColorFallingBottom": "rgba(255, 74, 104, 0)",
+                "symbolActiveColor": "rgba(225, 232, 243, 1)",
+                "tabs": [
+                    { "title": "Losers", "symbols": [], "originalTitle": "Losers" }  // Auto-pulls top losers
+                ]
+            }
+            </script>
+        </div>
+    </div>
+
+    <div id="high" class="tab-content">
+        <h2>52 Week High (NSE)</h2>
+        <!-- TradingView Widget: Screener filtered for 52-Week High -->
+        <div class="tradingview-widget-container widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+            {
+                "width": "100%",
+                "height": "100%",
+                "defaultColumn": "overview",
+                "screener_type": "stocks",
+                "displayCurrency": "INR",
+                "colorTheme": "light",
+                "locale": "en",
+                "exchange": "NSE",
+                "data": "52_week_high"  // Filter for 52-week high
+            }
+            </script>
+        </div>
+    </div>
+
+    <div id="low" class="tab-content">
+        <h2>52 Week Low (NSE)</h2>
+        <!-- TradingView Widget: Screener filtered for 52-Week Low -->
+        <div class="tradingview-widget-container widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+            {
+                "width": "100%",
+                "height": "100%",
+                "defaultColumn": "overview",
+                "screener_type": "stocks",
+                "displayCurrency": "INR",
+                "colorTheme": "light",
+                "locale": "en",
+                "exchange": "NSE",
+                "data": "52_week_low"  // Filter for 52-week low
+            }
+            </script>
+        </div>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            var tabs = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            var buttons = document.getElementsByClassName("tab-button");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            event.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
