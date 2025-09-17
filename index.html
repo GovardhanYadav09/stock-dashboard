@@ -3,177 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Indian Stock Dashboard</title>
+    <title>Indian Stock Market Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
-        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; }
-        .tab-button { padding: 10px 20px; background: #ddd; cursor: pointer; border-radius: 5px 5px 0 0; }
-        .tab-button.active { background: #fff; }
-        .tab-content { display: none; background: #fff; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .tab-content.active { display: block; }
-        .widget-container { height: 500px; margin-bottom: 20px; } /* Adjust height as needed */
+        /*
+         * DESIGN & DEV NOTES (Apple-Inspired Minimalist UI):
+         * - Uses CSS variables (:root) for easy theming and maintenance.
+         * - Font Stack: Prioritizes system fonts for native look & feel (-apple-system, Segoe UI).
+         * - Layout: Flexbox is used for responsive alignment. The main container has a max-width
+         * for readability on large screens.
+         * - Aesthetic: Subtle shadows, rounded corners, and generous padding create a clean,
+         * card-like interface. De-emphasizes the UI to let the data stand out.
+         * - Tabs: Designed as a "segmented control," a common iOS pattern. The active state is clear
+         * but not distracting.
+        */
+        :root {
+            --background-color: #f5f5f7;
+            --card-background-color: #ffffff;
+            --text-color: #1d1d1f;
+            --subtle-text-color: #6e6e73;
+            --accent-color: #0071e3;
+            --border-color: #d2d2d7;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: var(--subtle-text-color);
+            margin-top: 0.5rem;
+        }
+
+        /* Tabs / Segmented Control */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--subtle-text-color);
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .tab-button:hover {
+            color: var(--text-color);
+        }
+
+        .tab-button.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        /* Tab Content Panel */
+        .tab-content {
+            display: none;
+            background-color: var(--card-background-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            overflow: hidden; /* Ensures child widgets respect the border-radius */
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .widget-container {
+            height: 600px; /* Increased height for better visibility */
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: var(--subtle-text-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .tab-button {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Real-Time Indian Stock Market Dashboard (NSE)</h1>
-    <p>Updates in real-time (<10s latency). Data from TradingView. Market hours: 9:15 AM - 3:30 PM IST.</p>
 
-    <div class="tabs">
-        <div class="tab-button active" onclick="openTab('indices')">Indian Indices</div>
-        <div class="tab-button" onclick="openTab('gainers')">Top Gainers</div>
-        <div class="tab-button" onclick="openTab('losers')">Top Losers</div>
-        <div class="tab-button" onclick="openTab('high')">52 Week High</div>
-        <div class="tab-button" onclick="openTab('low')">52 Week Low</div>
-    </div>
+    <main class="dashboard-container">
+        <header>
+            <h1>Indian Stock Market</h1>
+            <p>A real-time overview of the National Stock Exchange (NSE) & Bombay Stock Exchange (BSE) indices.</p>
+        </header>
 
-    <div id="indices" class="tab-content active">
-        <h2>Indian Indices</h2>
-        <!-- TradingView Widget: Ticker for Indices (Current Value, Change, High, Low) -->
-        <!-- Replace symbols with NSE ones: NIFTY, SENSEX (BSE:SENSEX), etc. -->
-        <div class="tradingview-widget-container widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-            {
-                "symbols": [
-                    { "proName": "NSE:NIFTY", "title": "NIFTY 50" },
-                    { "proName": "BSE:SENSEX", "title": "SENSEX" },
-                    { "proName": "NSE:BANKNIFTY", "title": "NIFTY BANK" },
-                    { "proName": "NSE:NIFTYNEXT50", "title": "NIFTY NEXT 50" }
-                ],
-                "colorTheme": "light",
-                "isTransparent": false,
-                "showSymbolLogo": true,
-                "locale": "en"
-            }
-            </script>
-        </div>
-    </div>
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="indices">Indices</button>
+            <button class="tab-button" data-tab="gainers">Top Gainers</button>
+            <button class="tab-button" data-tab="losers">Top Losers</button>
+            <button class="tab-button" data-tab="high">52-Week High</button>
+            <button class="tab-button" data-tab="low">52-Week Low</button>
+        </nav>
 
-    <div id="gainers" class="tab-content">
-        <h2>Top Gainers (NSE)</h2>
-        <!-- TradingView Widget: Stock Market Overview for Gainers -->
-        <div class="tradingview-widget-container widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-            {
-                "colorTheme": "light",
-                "dateRange": "1D",
-                "exchange": "NSE",
-                "showChart": true,
-                "locale": "en",
-                "largeChartUrl": "",
-                "isTransparent": false,
-                "showSymbolLogo": false,
-                "showFloatingTooltip": false,
-                "width": "100%",
-                "height": "100%",
-                "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
-                "plotLineColorFalling": "rgba(255, 74, 104, 1)",
-                "gridLineColor": "rgba(240, 243, 250, 1)",
-                "scaleFontColor": "rgba(106, 109, 120, 1)",
-                "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
-                "belowLineFillColorFalling": "rgba(255, 74, 104, 0.12)",
-                "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
-                "belowLineFillColorFallingBottom": "rgba(255, 74, 104, 0)",
-                "symbolActiveColor": "rgba(225, 232, 243, 1)",
-                "tabs": [
-                    { "title": "Gainers", "symbols": [], "originalTitle": "Gainers" }  // Auto-pulls top gainers
-                ]
-            }
-            </script>
-        </div>
-    </div>
+        <section id="indices" class="tab-content active">
+            <div class="widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                {
+                    "symbols": [
+                        { "proName": "NSE:NIFTY", "title": "NIFTY 50" },
+                        { "proName": "BSE:SENSEX", "title": "SENSEX" },
+                        { "proName": "NSE:BANKNIFTY", "title": "NIFTY BANK" },
+                        { "proName": "NSE:NIFTYNEXT50", "title": "NIFTY NEXT 50" },
+                        { "proName": "NSE:NIFTYIT", "title": "NIFTY IT" }
+                    ],
+                    "colorTheme": "light",
+                    "isTransparent": true,
+                    "showSymbolLogo": true,
+                    "locale": "en"
+                }
+                </script>
+            </div>
+        </section>
 
-    <div id="losers" class="tab-content">
-        <h2>Top Losers (NSE)</h2>
-        <!-- Similar to Gainers, but for Losers -->
-        <div class="tradingview-widget-container widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
-            {
-                "colorTheme": "light",
-                "dateRange": "1D",
-                "exchange": "NSE",
-                "showChart": true,
-                "locale": "en",
-                "largeChartUrl": "",
-                "isTransparent": false,
-                "showSymbolLogo": false,
-                "showFloatingTooltip": false,
-                "width": "100%",
-                "height": "100%",
-                "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
-                "plotLineColorFalling": "rgba(255, 74, 104, 1)",
-                "gridLineColor": "rgba(240, 243, 250, 1)",
-                "scaleFontColor": "rgba(106, 109, 120, 1)",
-                "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
-                "belowLineFillColorFalling": "rgba(255, 74, 104, 0.12)",
-                "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
-                "belowLineFillColorFallingBottom": "rgba(255, 74, 104, 0)",
-                "symbolActiveColor": "rgba(225, 232, 243, 1)",
-                "tabs": [
-                    { "title": "Losers", "symbols": [], "originalTitle": "Losers" }  // Auto-pulls top losers
-                ]
-            }
-            </script>
-        </div>
-    </div>
+        <section id="gainers" class="tab-content">
+            <div class="widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                {
+                    "colorTheme": "light",
+                    "dateRange": "1D",
+                    "exchange": "NSE",
+                    "showChart": true,
+                    "locale": "en",
+                    "isTransparent": true,
+                    "showSymbolLogo": true,
+                    "width": "100%",
+                    "height": "100%",
+                    "tabs": [{ "title": "Gainers", "symbols": [], "originalTitle": "Gainers" }]
+                }
+                </script>
+            </div>
+        </section>
 
-    <div id="high" class="tab-content">
-        <h2>52 Week High (NSE)</h2>
-        <!-- TradingView Widget: Screener filtered for 52-Week High -->
-        <div class="tradingview-widget-container widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-            {
-                "width": "100%",
-                "height": "100%",
-                "defaultColumn": "overview",
-                "screener_type": "stocks",
-                "displayCurrency": "INR",
-                "colorTheme": "light",
-                "locale": "en",
-                "exchange": "NSE",
-                "data": "52_week_high"  // Filter for 52-week high
-            }
-            </script>
-        </div>
-    </div>
+        <section id="losers" class="tab-content">
+            <div class="widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                {
+                    "colorTheme": "light",
+                    "dateRange": "1D",
+                    "exchange": "NSE",
+                    "showChart": true,
+                    "locale": "en",
+                    "isTransparent": true,
+                    "showSymbolLogo": true,
+                    "width": "100%",
+                    "height": "100%",
+                    "tabs": [{ "title": "Losers", "symbols": [], "originalTitle": "Losers" }]
+                }
+                </script>
+            </div>
+        </section>
 
-    <div id="low" class="tab-content">
-        <h2>52 Week Low (NSE)</h2>
-        <!-- TradingView Widget: Screener filtered for 52-Week Low -->
-        <div class="tradingview-widget-container widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
-            {
-                "width": "100%",
-                "height": "100%",
-                "defaultColumn": "overview",
-                "screener_type": "stocks",
-                "displayCurrency": "INR",
-                "colorTheme": "light",
-                "locale": "en",
-                "exchange": "NSE",
-                "data": "52_week_low"  // Filter for 52-week low
-            }
-            </script>
-        </div>
-    </div>
+        <section id="high" class="tab-content">
+            <div class="widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+                {
+                    "width": "100%",
+                    "height": "100%",
+                    "defaultColumn": "overview",
+                    "screener_type": "stock",
+                    "displayCurrency": "INR",
+                    "colorTheme": "light",
+                    "locale": "en",
+                    "isTransparent": true,
+                    "market": "india",
+                    "filter_fundamental": [
+                        ["52_week_high", "eq", "close"]
+                    ]
+                }
+                </script>
+            </div>
+        </section>
+
+        <section id="low" class="tab-content">
+            <div class="widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async>
+                {
+                    "width": "100%",
+                    "height": "100%",
+                    "defaultColumn": "overview",
+                    "screener_type": "stock",
+                    "displayCurrency": "INR",
+                    "colorTheme": "light",
+                    "locale": "en",
+                    "isTransparent": true,
+                    "market": "india",
+                    "filter_fundamental": [
+                        ["52_week_low", "eq", "close"]
+                    ]
+                }
+                </script>
+            </div>
+        </section>
+
+        <footer>
+            <p>Market data is provided by TradingView. Updates are near real-time. Market hours: 9:15 AM - 3:30 PM IST.</p>
+        </footer>
+
+    </main>
 
     <script>
-        function openTab(tabName) {
-            var tabs = document.getElementsByClassName("tab-content");
-            for (var i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove("active");
-            }
-            var buttons = document.getElementsByClassName("tab-button");
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            event.currentTarget.classList.add("active");
-        }
+        /*
+         * ROBUST JAVASCRIPT LOGIC:
+         * - Separation of Concerns: JavaScript logic is kept separate from HTML attributes (no "onclick").
+         * This makes the code cleaner and easier to debug.
+         * - Efficient DOM Traversal: Uses modern `querySelectorAll` and `forEach` for handling events.
+         * - Data Attributes: Uses `data-tab` attributes, which is the modern standard for linking
+         * interactive elements to their content.
+        */
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and content
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tabContents.forEach(item => item.classList.remove('active'));
+
+                    // Add active class to the clicked tab and corresponding content
+                    const targetContent = document.getElementById(tab.dataset.tab);
+                    tab.classList.add('active');
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
